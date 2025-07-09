@@ -30,6 +30,10 @@ sealed interface SettingsEvent {
 
   data class ToggleAutoSync(val value: Boolean) : SettingsEvent
 
+  data class ToggleCloudSync(val value: Boolean) : SettingsEvent
+
+  data object CloudSyncNowClicked : SettingsEvent
+
   data class ToggleShowFeedFavIcon(val value: Boolean) : SettingsEvent
 
   data object ImportOpmlClicked : SettingsEvent

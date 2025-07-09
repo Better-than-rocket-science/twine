@@ -43,6 +43,8 @@ abstract class ApplicationComponent(@get:Provides val context: Context) :
 
   abstract val billingHandler: BillingHandler
 
+  abstract val cloudSyncEngine: dev.sasikanth.rss.reader.data.cloudsync.CloudSyncEngine
+
   @Provides
   @AppScope
   fun providesAppInfo(context: Context): AppInfo {

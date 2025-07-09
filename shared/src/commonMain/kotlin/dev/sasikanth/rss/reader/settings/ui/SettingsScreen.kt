@@ -301,6 +301,15 @@ internal fun SettingsScreen(
             )
           }
 
+          item {
+            CloudSyncSettingItem(
+              cloudSyncEnabled = state.cloudSyncEnabled,
+              lastSyncedAt = state.lastCloudSync,
+              onToggle = { viewModel.dispatch(SettingsEvent.ToggleCloudSync(it)) },
+              onSyncNow = { viewModel.dispatch(SettingsEvent.CloudSyncNowClicked) }
+            )
+          }
+
           item { Divider(24.dp) }
 
           item {
@@ -741,6 +750,61 @@ private fun AutoSyncSettingItem(enableAutoSync: Boolean, onValueChanged: (Boolea
         checked = checked,
         onCheckedChange = { checked -> onValueChanged(checked) },
       )
+    }
+  }
+}
+
+@Composable
+private fun CloudSyncSettingItem(
+  cloudSyncEnabled: Boolean,
+  lastSyncedAt: String?,
+  onToggle: (Boolean) -> Unit,
+  onSyncNow: () -> Unit,
+) {
+  var checked by remember(cloudSyncEnabled) { mutableStateOf(cloudSyncEnabled) }
+  Box(
+    modifier =
+      Modifier.clickable {
+        checked = !checked
+        onToggle(!cloudSyncEnabled)
+      }
+  ) {
+    Row(
+      modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp, bottom = 20.dp),
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Column(modifier = Modifier.weight(1f)) {
+        Text(
+          stringResource(Res.string.cloudSyncTitle),
+          style = MaterialTheme.typography.titleMedium,
+          color = AppTheme.colorScheme.textEmphasisHigh
+        )
+        Text(
+          stringResource(Res.string.cloudSyncDesc),
+          style = MaterialTheme.typography.labelLarge,
+          color = AppTheme.colorScheme.textEmphasisMed
+        )
+        lastSyncedAt?.let { last ->
+          Text(
+            stringResource(Res.string.cloudSyncLast, last),
+            style = MaterialTheme.typography.labelSmall,
+            color = AppTheme.colorScheme.textEmphasisLow
+          )
+        }
+      }
+
+      Spacer(Modifier.width(16.dp))
+
+      Switch(
+        checked = checked,
+        onCheckedChange = { checked -> onToggle(checked) },
+      )
+    }
+  }
+
+  if (cloudSyncEnabled) {
+    TextButton(onClick = onSyncNow, modifier = Modifier.padding(start = 24.dp)) {
+      Text(stringResource(Res.string.cloudSyncNow))
     }
   }
 }

@@ -27,6 +27,8 @@ import dev.sasikanth.rss.reader.data.repository.Period
 import dev.sasikanth.rss.reader.data.repository.RssRepository
 import dev.sasikanth.rss.reader.data.repository.SettingsRepository
 import dev.sasikanth.rss.reader.opml.OpmlManager
+import dev.sasikanth.rss.reader.data.cloudsync.CloudSyncEngine
+import dev.sasikanth.rss.reader.data.cloudsync.SyncSettingsStore
 import dev.sasikanth.rss.reader.utils.combine
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,6 +43,8 @@ class SettingsViewModel(
   rssRepository: RssRepository,
   appInfo: AppInfo,
   private val settingsRepository: SettingsRepository,
+  private val syncSettingsStore: SyncSettingsStore,
+  private val cloudSyncEngine: CloudSyncEngine,
   private val opmlManager: OpmlManager,
   private val billingHandler: BillingHandler,
 ) : ViewModel() {
@@ -58,7 +62,9 @@ class SettingsViewModel(
         settingsRepository.appThemeMode,
         settingsRepository.enableAutoSync,
         settingsRepository.showFeedFavIcon,
-        settingsRepository.markAsReadOn
+        settingsRepository.markAsReadOn,
+        syncSettingsStore.cloudSyncEnabled,
+        syncSettingsStore.lastSyncAt
       ) {
         browserType,
         showUnreadPostsCount,
@@ -67,7 +73,9 @@ class SettingsViewModel(
         appThemeMode,
         enableAutoSync,
         showFeedFavIcon,
-        markAsReadOn ->
+        markAsReadOn,
+        cloudSyncEnabled,
+        lastSyncAt ->
         Settings(
           browserType = browserType,
           showUnreadPostsCount = showUnreadPostsCount,
@@ -75,6 +83,8 @@ class SettingsViewModel(
           showReaderView = showReaderView,
           appThemeMode = appThemeMode,
           enableAutoSync = enableAutoSync,
+          cloudSyncEnabled = cloudSyncEnabled,
+          lastCloudSync = lastSyncAt?.toString(),
           showFeedFavIcon = showFeedFavIcon,
           markAsReadOn = markAsReadOn,
         )
@@ -88,6 +98,8 @@ class SettingsViewModel(
             showReaderView = settings.showReaderView,
             appThemeMode = settings.appThemeMode,
             enableAutoSync = settings.enableAutoSync,
+            cloudSyncEnabled = settings.cloudSyncEnabled,
+            lastCloudSync = settings.lastCloudSync,
             showFeedFavIcon = settings.showFeedFavIcon,
             markAsReadOn = settings.markAsReadOn
           )
@@ -111,6 +123,8 @@ class SettingsViewModel(
       is SettingsEvent.ToggleShowUnreadPostsCount -> toggleShowUnreadPostsCount(event.value)
       is SettingsEvent.ToggleShowReaderView -> toggleShowReaderView(event.value)
       is SettingsEvent.ToggleAutoSync -> toggleAutoSync(event.value)
+      is SettingsEvent.ToggleCloudSync -> toggleCloudSync(event.value)
+      SettingsEvent.CloudSyncNowClicked -> cloudSyncNow()
       is SettingsEvent.ToggleShowFeedFavIcon -> toggleShowFeedFavIcon(event.value)
       SettingsEvent.ImportOpmlClicked -> importOpmlClicked()
       SettingsEvent.ExportOpmlClicked -> exportOpmlClicked()
@@ -142,6 +156,17 @@ class SettingsViewModel(
 
   private fun toggleAutoSync(value: Boolean) {
     viewModelScope.launch { settingsRepository.toggleAutoSync(value) }
+  }
+
+  private fun toggleCloudSync(value: Boolean) {
+    viewModelScope.launch { syncSettingsStore.setCloudSyncEnabled(value) }
+  }
+
+  private fun cloudSyncNow() {
+    viewModelScope.launch {
+      cloudSyncEngine.sync()
+      syncSettingsStore.updateLastSyncAt()
+    }
   }
 
   private fun onAppThemeModeChanged(appThemeMode: AppThemeMode) {
@@ -191,6 +216,8 @@ private data class Settings(
   val showReaderView: Boolean,
   val appThemeMode: AppThemeMode,
   val enableAutoSync: Boolean,
+  val cloudSyncEnabled: Boolean,
+  val lastCloudSync: String?,
   val showFeedFavIcon: Boolean,
   val markAsReadOn: MarkAsReadOn,
 )

@@ -48,6 +48,8 @@ abstract class ApplicationComponent(
 
   abstract val billingHandler: BillingHandler
 
+  abstract val cloudSyncEngine: dev.sasikanth.rss.reader.data.cloudsync.CloudSyncEngine
+
   @Provides
   @AppScope
   @OptIn(ExperimentalNativeApi::class)

@@ -136,6 +136,10 @@
     <string name="cdLoadFullArticle">Load full article</string>
     <string name="enableAutoSyncTitle">Enable auto sync</string>
     <string name="enableAutoSyncDesc">When turned-on, feeds will be updated in the background</string>
+    <string name="cloudSyncTitle">Enable cloud sync</string>
+    <string name="cloudSyncDesc">Sync feeds and read status using your cloud account</string>
+    <string name="cloudSyncNow">Sync now</string>
+    <string name="cloudSyncLast">Last sync: %1$s</string>
     <string name="showFeedFavIconTitle">Show feed fav icon</string>
     <string name="showFeedFavIconDesc">When turned-off, the feed icon will be displayed instead of the website's favicon</string>
     <string name="blockedWords">Blocked words</string>

@@ -19,19 +19,28 @@ import dev.sasikanth.rss.reader.billing.BillingComponent
 import dev.sasikanth.rss.reader.core.network.di.NetworkComponent
 import dev.sasikanth.rss.reader.data.di.DataComponent
 import dev.sasikanth.rss.reader.data.time.LastRefreshedAt
+import dev.sasikanth.rss.reader.data.cloudsync.SyncSettingsStore
 import dev.sasikanth.rss.reader.di.scopes.AppScope
 import dev.sasikanth.rss.reader.initializers.Initializer
 import dev.sasikanth.rss.reader.logging.LoggingComponent
+import dev.sasikanth.rss.reader.cloudsync.CloudSyncComponent
 import dev.sasikanth.rss.reader.util.DefaultDispatchersProvider
 import dev.sasikanth.rss.reader.util.DispatchersProvider
 import me.tatarka.inject.annotations.Provides
 
 abstract class SharedApplicationComponent :
-  DataComponent, NetworkComponent, LoggingComponent, ImageLoaderComponent, BillingComponent {
+  DataComponent,
+  NetworkComponent,
+  LoggingComponent,
+  ImageLoaderComponent,
+  BillingComponent,
+  CloudSyncComponent {
 
   abstract val initializers: Set<Initializer>
 
   abstract val lastRefreshedAt: LastRefreshedAt
+
+  abstract val syncSettingsStore: SyncSettingsStore
 
   @Provides @AppScope fun DefaultDispatchersProvider.bind(): DispatchersProvider = this
 }

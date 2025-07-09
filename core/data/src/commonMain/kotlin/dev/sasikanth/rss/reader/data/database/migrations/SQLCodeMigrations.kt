@@ -26,13 +26,22 @@ import dev.sasikanth.rss.reader.util.nameBasedUuidOf
 object SQLCodeMigrations {
 
   fun migrations(): Array<AfterVersion> {
-    return arrayOf(afterVersion12(), afterVersion13())
+    return arrayOf(afterVersion12(), afterVersion13(), afterVersion14())
   }
 
   private fun afterVersion13(): AfterVersion {
     return AfterVersion(13) { driver ->
       val feedIds = FeedsIdsQuery(driver).executeAsList()
       feedIds.forEach { feedId -> migrateFeedsLinkIdsToUuid(feedId, driver) }
+    }
+  }
+
+  private fun afterVersion14(): AfterVersion {
+    return AfterVersion(14) { driver ->
+      driver.execute(null, "ALTER TABLE feed ADD COLUMN lastModified INTEGER", 0)
+      driver.execute(null, "ALTER TABLE post ADD COLUMN lastModified INTEGER", 0)
+      driver.execute(null, "ALTER TABLE feedGroup ADD COLUMN lastModified INTEGER", 0)
+      driver.execute(null, "ALTER TABLE bookmark ADD COLUMN lastModified INTEGER", 0)
     }
   }
 

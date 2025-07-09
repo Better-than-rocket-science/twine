@@ -21,6 +21,7 @@ import dev.sasikanth.rss.reader.data.repository.RssRepository
 import dev.sasikanth.rss.reader.data.repository.SettingsRepository
 import dev.sasikanth.rss.reader.data.sync.SyncCoordinator
 import dev.sasikanth.rss.reader.data.time.LastRefreshedAt
+import dev.sasikanth.rss.reader.data.cloudsync.CloudSyncCoordinator
 import dev.sasikanth.rss.reader.di.scopes.ActivityScope
 import dev.sasikanth.rss.reader.platform.LinkHandler
 import dev.sasikanth.rss.reader.util.DispatchersProvider
@@ -43,6 +44,7 @@ class AppViewModel(
   private val settingsRepository: SettingsRepository,
   private val linkHandler: LinkHandler,
   private val syncCoordinator: SyncCoordinator,
+  private val cloudSyncCoordinator: CloudSyncCoordinator,
 ) : ViewModel() {
 
   private val _state = MutableStateFlow(AppState.DEFAULT)
@@ -50,6 +52,7 @@ class AppViewModel(
     get() = _state
 
   init {
+    viewModelScope.launch { cloudSyncCoordinator.sync() }
     refreshFeedsIfExpired()
     combine(
         settingsRepository.appThemeMode,

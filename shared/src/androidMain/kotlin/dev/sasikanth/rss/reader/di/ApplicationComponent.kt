@@ -39,6 +39,8 @@ abstract class ApplicationComponent(@get:Provides val context: Context) :
 
   abstract val syncCoordinator: SyncCoordinator
 
+  abstract val cloudSyncCoordinator: dev.sasikanth.rss.reader.data.cloudsync.CloudSyncCoordinator
+
   abstract val widgetDataRepository: WidgetDataRepository
 
   abstract val billingHandler: BillingHandler
